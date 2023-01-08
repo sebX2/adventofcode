@@ -10,15 +10,17 @@ import (
 )
 
 func main() {
-	Run202202()
+	Run202202(1)
+	Run202202(2)
 }
 
-func Run202202() {
+func Run202202(part int) {
 	f, err := os.Open("./2022-02/input")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
 	reader := bufio.NewReader(f)
-	fmt.Println("Score: " + strconv.Itoa(adventofcode2022_02.GetScoreOfMatch(reader)))
+	fmt.Println("Score: " + strconv.Itoa(adventofcode2022_02.GetScoreOfMatch(reader, part)))
+
 }
