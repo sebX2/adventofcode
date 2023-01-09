@@ -4,17 +4,20 @@ import (
 	"bufio"
 	"errors"
 	"io"
-	"log"
 	"strings"
 )
 
-func (s *ScoreAccount) PlayRoundPart1(yourGestureCode, myGestureCode string) {
+func (s *ScoreAccount) PlayRoundPart1(yourGestureCode, myGestureCode string) error {
 	yourGesture := gestureAssignment[yourGestureCode]
 	myGesture := gestureAssignment[myGestureCode]
 	gestureScore := GestureScore[myGesture]
 	var matchScore int
 	//fmt.Printf("Playing %s %s agianst %s %s.\n", myGestureCode, string(myGesture), yourGestureCode, string(yourGesture))
-	switch DidIWin(yourGesture, myGesture) {
+	won, err := DidIWin(yourGesture, myGesture)
+	if err != nil {
+		return err
+	}
+	switch won {
 	case -1:
 		matchScore = RoundScoreLoss
 	case 0:
@@ -26,6 +29,7 @@ func (s *ScoreAccount) PlayRoundPart1(yourGestureCode, myGestureCode string) {
 	//fmt.Printf("GestureScore %d + MatchScore %d = %d\n", gestureScore, matchScore, roundScore)
 	s.TotalScore += roundScore
 	//fmt.Printf("Total Score: %d\n", s.TotalScore)
+	return nil
 }
 
 func (s *ScoreAccount) PlayRoundPart2(yourGestureCode, strategicOutcomeCode string) error {
@@ -35,7 +39,11 @@ func (s *ScoreAccount) PlayRoundPart2(yourGestureCode, strategicOutcomeCode stri
 		return err
 	}
 	var matchScore int
-	switch DidIWin(yourGesture, myGesture) {
+	won, err := DidIWin(yourGesture, myGesture)
+	if err != nil {
+		return err
+	}
+	switch won {
 	case -1:
 		matchScore = RoundScoreLoss
 	case 0:
@@ -49,7 +57,7 @@ func (s *ScoreAccount) PlayRoundPart2(yourGestureCode, strategicOutcomeCode stri
 	return nil
 }
 
-func GetStrategicGesture(yourGesture gesture, strategicOutcomeCode string) (gesture, error) {
+func GetStrategicGesture(yourGesture Gesture, strategicOutcomeCode string) (Gesture, error) {
 	switch strategicOutcomeCode {
 	// loose
 	case "X":
@@ -85,7 +93,7 @@ func GetStrategicGesture(yourGesture gesture, strategicOutcomeCode string) (gest
 	return "", errors.New("UnhandeledParameter")
 }
 
-func GetScoreOfMatch(reader io.Reader, part int) (score int) {
+func GetScoreOfMatch(reader io.Reader, part int) (score int, err error) {
 
 	scanner := bufio.NewScanner(reader)
 
@@ -94,48 +102,52 @@ func GetScoreOfMatch(reader io.Reader, part int) (score int) {
 		round := strings.Split(scanner.Text(), " ")
 		switch part {
 		case 1:
-			myAccount.PlayRoundPart1(round[0], round[1])
+			if err := myAccount.PlayRoundPart1(round[0], round[1]); err != nil {
+				return 0, err
+			}
 		case 2:
-			myAccount.PlayRoundPart2(round[0], round[1])
+			if err := myAccount.PlayRoundPart2(round[0], round[1]); err != nil {
+				return 0, err
+			}
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
-	return myAccount.TotalScore
+	return myAccount.TotalScore, nil
 }
 
-func DidIWin(yourGesture, myGesture gesture) int {
+func DidIWin(yourGesture, myGesture Gesture) (int, error) {
 	switch myGesture {
 	case Rock:
 		switch yourGesture {
 		case Rock:
-			return 0
+			return 0, nil
 		case Paper:
-			return -1
+			return -1, nil
 		case Scissors:
-			return 1
+			return 1, nil
 		}
 	case Paper:
 		switch yourGesture {
 		case Rock:
-			return 1
+			return 1, nil
 		case Paper:
-			return 0
+			return 0, nil
 		case Scissors:
-			return -1
+			return -1, nil
 		}
 	case Scissors:
 		switch yourGesture {
 		case Rock:
-			return -1
+			return -1, nil
 		case Paper:
-			return 1
+			return 1, nil
 		case Scissors:
-			return 0
+			return 0, nil
 		}
 	}
-	return 0
+	return 0, errors.New("UnhandeledParameter")
 }

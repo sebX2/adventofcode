@@ -1,12 +1,12 @@
 package adventofcode2022_02
 
-type gesture string
+type Gesture string
 
-const Rock gesture = "Rock"
-const Paper gesture = "Paper"
-const Scissors gesture = "Scissors"
+const Rock Gesture = "Rock"
+const Paper Gesture = "Paper"
+const Scissors Gesture = "Scissors"
 
-var gestureAssignment = map[string]gesture{
+var gestureAssignment = map[string]Gesture{
 	"A": Rock,
 	"X": Rock,
 	"B": Paper,
@@ -15,7 +15,7 @@ var gestureAssignment = map[string]gesture{
 	"Z": Scissors,
 }
 
-var GestureScore = map[gesture]int{
+var GestureScore = map[Gesture]int{
 	Rock:     1,
 	Paper:    2,
 	Scissors: 3,
