@@ -90,7 +90,7 @@ func GetStrategicGesture(yourGesture Gesture, strategicOutcomeCode string) (Gest
 			return Rock, nil
 		}
 	}
-	return "", errors.New("UnhandeledParameter")
+	return "", errors.New("UnhandledParameter")
 }
 
 func GetScoreOfMatch(reader io.Reader, part int) (score int, err error) {
@@ -149,5 +149,5 @@ func DidIWin(yourGesture, myGesture Gesture) (int, error) {
 			return 0, nil
 		}
 	}
-	return 0, errors.New("UnhandeledParameter")
+	return 0, errors.New("UnhandledParameter")
 }
